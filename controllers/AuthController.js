@@ -9,7 +9,6 @@ const { promisify } = require('util')
 const unlinkAsync = promisify(fs.unlink)
 
 const register = async (req, res, next) => {
-
     const hashedPass = await bcrypt.hash(req.body.password, 10);
 
     let user = new User ({
