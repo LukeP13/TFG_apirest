@@ -13,8 +13,8 @@ const authenticate  = require('./middleware/authenticate')
 
 //Connect DB
 mongoose.connect(
-    process.env.DB_CONNECTION, 
-    { useNewUrlParser: true,  useUnifiedTopology: true  }
+    process.env.LOCAL_DB_CONNECTION, 
+    { useNewUrlParser: true,  useUnifiedTopology: true, useCreateIndex: true  }
 )
 const db = mongoose.connection
 
@@ -35,7 +35,7 @@ app.use(cors());
 app.use(morgan('dev'))
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }))
-app.use('/uploads', express.static('uploads'))
+app.use('/uploads', authenticate, express.static('uploads'))
 
 
 //Start listening

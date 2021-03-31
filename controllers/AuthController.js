@@ -1,35 +1,36 @@
 require('dotenv/config')
 
-const User      = require('../models/User')
-const bcrypt    = require('bcryptjs')
-const jwt       = require('jsonwebtoken')
+const User          = require('../models/User')
+const bcrypt        = require('bcryptjs')
+const jwt           = require('jsonwebtoken')
+const fs            = require('fs')
+const { promisify } = require('util')
 
-const register = (req, res, next) => {
-    bcrypt.hash(req.body.password, 10, function(err, hashedPass){
-        if(err){
-            res.json({
-                error: err
-            })
-        }
+const unlinkAsync = promisify(fs.unlink)
 
-        let user = new User ({
-            username:   req.body.username,
-            email:      req.body.email,
-            password:   hashedPass,
-            phone:      req.body.phone
-        })
-        user.save()
-            .then(user => {
-                res.json({
-                    message: 'User Added Successfully!'
-                })
-            })
-            .catch(err => {
-                res.json({
-                    message: 'An error occured!'
-                })
-            })
+const register = async (req, res, next) => {
+
+    const hashedPass = await bcrypt.hash(req.body.password, 10);
+
+    let user = new User ({
+        username:   req.body.username,
+        email:      req.body.email,
+        password:   hashedPass,
+        phone:      req.body.phone,
+        avatar:     req.file ? req.file.path : null
     })
+
+    user.save()
+        .then(_ => res.json({ message: 'User Added Successfully!' }))
+        .catch(async err => {
+            if(req.file) await unlinkAsync(req.file.path)
+            switch(err.code){
+                case 11000: //Duplicate
+                    return res.status(400).json({ status: 'error', error: 'Username or Email already exist' })
+                default:
+                    return res.status(500).json({ status: 'error', message: err.message })
+            }
+        })
 }
 
 const login = (req, res, next) => {
@@ -38,31 +39,26 @@ const login = (req, res, next) => {
 
     User.findOne({$or: [{email:_username}, {username:_username}]})
         .then(user => {
-            if(user){
-                bcrypt.compare(_password, user.password, function(err, result){
-                    if(err){
-                        res.json({
-                            error: err
-                        })
-                    }
+            const correct = bcrypt.compare(_password, user.password)
 
-                    if(result){
-                        let token = jwt.sign({name: user.name}, process.env.JWT_TOKEN_KEY, {expiresIn: process.env.LOGIN_EXPIRE_TIME || '1h'})
-                        res.json({
-                            message: 'Login successful!',
-                            token
-                        })
-                    } else {
-                        res.json({
-                            message: 'Username or Password incorrect!'
-                        })
-                    }
+            if(correct){
+                let token = jwt.sign({name: user.name}, process.env.JWT_TOKEN_KEY, {expiresIn: process.env.LOGIN_EXPIRE_TIME || '1h'})
+                res.json({
+                    message: 'Login successful!',
+                    token
                 })
             } else {
-                res.json({
-                    message: 'No user found!'
+                res.status(401).json({
+                    status:  'error',
+                    message: 'Username or Password incorrect!'
                 })
             }
+        })
+        .catch(_ => {
+            res.status(404).json({
+                status: 'error',
+                message: 'No user found!'
+            })
         })
 }
 
