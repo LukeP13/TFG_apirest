@@ -3,12 +3,12 @@ const Schema        = mongoose.Schema
 
 const UserSchema    = Schema({
     //Login details
-    username: { type: String, required: true, unique: true },
-    email:    { type: String, required: true, unique: true },
-    password: { type: String, required: true },
+    username: { type: String, required: true, unique: true, min: 6, max: 255 },
+    email:    { type: String, required: true, unique: true, min: 6, max: 255 },
+    password: { type: String, required: true, max: 1024 },
 
     //Optional
-    phone:  { type: String },
+    phone:  { type: String, max: 15 },
     avatar: { type: String }
 }, { timestamps: true})
 
