@@ -8,7 +8,7 @@ const cors          = require('cors')
 const AuthRoute     = require('./routes/auth')
 const UsersRoute    = require('./routes/users')
 
-const authenticate  = require('./middleware/authenticate')
+const authenticate  = require('./middlewares/authenticate')
 
 
 //Connect DB
