@@ -45,6 +45,8 @@ const login = (req, res, next) => {
                 let token = jwt.sign({name: user.name}, process.env.JWT_TOKEN_KEY, {expiresIn: process.env.LOGIN_EXPIRE_TIME || '1h'})
                 res.json({
                     message: 'Login successful!',
+                    userId: user.id,
+                    expiresOn: new Date(Date.now() + 60*60*1000), 
                     token
                 })
             } else {
