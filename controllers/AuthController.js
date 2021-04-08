@@ -37,31 +37,29 @@ const login = (req, res, next) => {
     let _username = req.body.username
     let _password = req.body.password
 
+    function error () { 
+        res.status(401).json({
+            status:  'error',
+            message: 'Username or Password incorrect!'
+        })
+    }
+
     User.findOne({$or: [{email:_username}, {username:_username}]})
         .then(user => {
-            const correct = bcrypt.compare(_password, user.password)
-
-            if(correct){
-                let token = jwt.sign({name: user.name}, process.env.JWT_TOKEN_KEY, {expiresIn: process.env.LOGIN_EXPIRE_TIME || '1h'})
-                res.json({
-                    message: 'Login successful!',
-                    userId: user.id,
-                    expiresOn: new Date(Date.now() + 60*60*1000), 
-                    token
-                })
-            } else {
-                res.status(401).json({
-                    status:  'error',
-                    message: 'Username or Password incorrect!'
-                })
-            }
+            bcrypt.compare(_password, user.password)
+                .then(correct => {
+                    if(correct){
+                        let token = jwt.sign({name: user.name}, process.env.JWT_TOKEN_KEY, {expiresIn: process.env.LOGIN_EXPIRE_TIME || '1h'})
+                        res.json({
+                            message: 'Login successful!',
+                            userId: user.id,
+                            expiresOn: new Date(Date.now() + 60*60*1000), 
+                            token
+                        })
+                    } else error();
+                }).catch(error)
         })
-        .catch(_ => {
-            res.status(404).json({
-                status: 'error',
-                message: 'No user found!'
-            })
-        })
+        .catch(error)
 }
 
 module.exports = {

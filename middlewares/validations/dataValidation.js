@@ -22,9 +22,9 @@ const registerValidation = validate.bind(null, Joi.object({
 }))
 
 const loginValidation = validate.bind(null, Joi.object({
-    username: Joi.string().min(5).max(255),
-    email:    Joi.string().min(5).max(255).email(),
-    password: Joi.string().min(6).max(200).required(),
+    username: Joi.string(),
+    email:    Joi.string().email(),
+    password: Joi.string().required(),
 }).xor('username', 'email'));
 
 module.exports = {
