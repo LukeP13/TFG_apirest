@@ -5,10 +5,11 @@ const mongoose      = require('mongoose')
 const morgan        = require('morgan')
 const cors          = require('cors')
 
-const AuthRoute     = require('./routes/auth')
-const UsersRoute    = require('./routes/users')
+const AuthRoute     = require('./src/routes/auth')
+const UsersRoute    = require('./src/routes/users')
+const BrandsRoute   = require('./src/routes/brands')
 
-const authenticate  = require('./middlewares/authenticate')
+const authenticate  = require('./src/middlewares/authenticate')
 
 
 //Connect DB
@@ -51,3 +52,4 @@ const preroute = process.env.PREROUTE || ""
 
 app.use(`${preroute}/`, AuthRoute)
 app.use(`${preroute}/users`, authenticate, UsersRoute)
+app.use(`${preroute}/brands`, authenticate, BrandsRoute)

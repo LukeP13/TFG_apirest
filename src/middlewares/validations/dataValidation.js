@@ -1,6 +1,6 @@
 const Joi           = require('joi')
 
-const { JsonError, HttpCodes } = require('../../requestErrors');
+const { JsonError, HttpCodes } = require('../../../requestErrors');
 
 
 const validate = (schema, req, res, next) => {
