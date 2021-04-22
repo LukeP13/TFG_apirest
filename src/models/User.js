@@ -1,7 +1,8 @@
-const mongoose      = require('mongoose')
-const Schema        = mongoose.Schema
+const mongoose          = require('mongoose')
+const Schema            = mongoose.Schema
+const { ModelSchema }   = require('./Model')
 
-const UserSchema    = Schema({
+const UserSchema = Schema({
     //Login details
     username: { type: String, required: true, unique: true, min: 6, max: 255 },
     email:    { type: String, required: true, unique: true, min: 6, max: 255 },
@@ -9,7 +10,11 @@ const UserSchema    = Schema({
 
     //Optional
     phone:  { type: String, max: 15 },
-    avatar: { type: String }
+    avatar: { type: String },
+
+    //Generated
+    notificationTokens: [String],
+    bikes: [ModelSchema],
 }, { timestamps: true})
 
 const User = mongoose.model('Users', UserSchema)

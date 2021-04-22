@@ -7,7 +7,7 @@ const upload            = require('../middlewares/uploadImages')
 
 /**** Routes ****/
 
-router.get('/', UserController.getUsers)
+router.get('/', UserController.getUsers);
 router.get('/:id', UserController.getUser);
 
 router.patch('/:id', upload.single('avatar'), UserController.update);

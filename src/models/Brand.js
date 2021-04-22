@@ -1,7 +1,7 @@
-const mongoose      = require('mongoose')
-const Schema        = mongoose.Schema
+const mongoose          = require('mongoose')
+const Schema            = mongoose.Schema
 
-const {ModelSchema}         = require('./Model')
+const { ModelSchema }   = require('./Model')
 
 const BrandSchema   = Schema({
     name:   { type: String, required: true },

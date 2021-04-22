@@ -34,8 +34,7 @@ const register = async (req, res, next) => {
 }
 
 const login = (req, res, next) => {
-    let _username = req.body.username
-    let _password = req.body.password
+    const{ username, password, notificationToken } = req.body
 
     function error () { 
         res.status(401).json({
@@ -44,16 +43,28 @@ const login = (req, res, next) => {
         })
     }
 
-    User.findOne({$or: [{email:_username}, {username:_username}]})
+    User.findOne({$or: [{email:username}, {username:username}]})
         .then(user => {
-            bcrypt.compare(_password, user.password)
+            bcrypt.compare(password, user.password)
                 .then(correct => {
                     if(correct){
-                        let token = jwt.sign({name: user.name}, process.env.JWT_TOKEN_KEY, {expiresIn: process.env.LOGIN_EXPIRE_TIME || '1h'})
+                        let token = jwt.sign({
+                            _id: user._id,
+                            notificationToken: notificationToken || "NULL"
+                        }, process.env.JWT_TOKEN_KEY, process.env.LOGIN_EXPIRE_TIME ? {expiresIn: process.env.LOGIN_EXPIRE_TIME} : null)
+                        
+                        if(notificationToken){
+                            //Save notification token
+                            User.updateOne(
+                                { _id: user._id },
+                                { $push: { notificationTokens: notificationToken } }
+                            )
+                        }
+
                         res.json({
                             message: 'Login successful!',
                             userId: user.id,
-                            expiresOn: new Date(Date.now() + 60*60*1000), 
+                            //expiresOn: new Date(Date.now() + 60*60*1000), 
                             token
                         })
                     } else error();
@@ -62,7 +73,21 @@ const login = (req, res, next) => {
         .catch(error)
 }
 
+const logout = async (req, res, next) => {
+    const { _id, notificationToken } = req.user;
+    if(notificationToken && notificationToken != "NULL"){
+        await User.updateOne(
+            { _id },
+            { $pop: { notificationTokens: notificationToken } }
+        )
+    }
+    
+    res.json();
+    next();
+}
+
 module.exports = {
     register,
-    login
+    login,
+    logout
 }
