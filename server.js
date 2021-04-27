@@ -66,6 +66,7 @@ app.use(`${preroute}/bikes`, authenticate, fullUser, BikesRoute)
 
 
 //Notifications
-cron.schedule("* * * * * *", function (params) {
+/*cron.schedule("* * * * * *", function (params) {
     console.log("running every second")
 })
+*/

@@ -50,7 +50,7 @@ const login = (req, res, next) => {
                     if(correct){
                         let token = jwt.sign({
                             _id: user._id,
-                            notificationToken: notificationToken || "NULL"
+                            notificationToken: notificationToken
                         }, process.env.JWT_TOKEN_KEY, process.env.LOGIN_EXPIRE_TIME ? {expiresIn: process.env.LOGIN_EXPIRE_TIME} : null)
                         
                         if(notificationToken){
