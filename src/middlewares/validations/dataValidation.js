@@ -25,6 +25,7 @@ const loginValidation = validate.bind(null, Joi.object({
     username: Joi.string(),
     email:    Joi.string().email(),
     password: Joi.string().required(),
+    notificationToken: Joi.string(),
 }).xor('username', 'email'));
 
 module.exports = {

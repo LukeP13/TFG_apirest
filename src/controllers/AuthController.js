@@ -46,7 +46,7 @@ const login = (req, res, next) => {
     User.findOne({$or: [{email:username}, {username:username}]})
         .then(user => {
             bcrypt.compare(password, user.password)
-                .then(correct => {
+                .then(async correct => {
                     if(correct){
                         let token = jwt.sign({
                             _id: user._id,
@@ -55,7 +55,7 @@ const login = (req, res, next) => {
                         
                         if(notificationToken){
                             //Save notification token
-                            User.updateOne(
+                            await User.updateOne(
                                 { _id: user._id },
                                 { $push: { notificationTokens: notificationToken } }
                             )
