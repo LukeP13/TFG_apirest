@@ -24,10 +24,12 @@ const getBikes = async (req, res, done) => {
 };
 
 const postBike = async (req, res, done) => {
-  const { _id } = req.user;
-  const bike = req.body;
+  const { _id, ...bike } = req.body;
   try {
-    const updated = await User.updateOne({ _id }, { $push: { bikes: bike } });
+    const updated = await User.updateOne(
+      { _id: req.user._id },
+      { $push: { bikes: bike } }
+    );
     res.json(updated);
     done();
   } catch (err) {

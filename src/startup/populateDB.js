@@ -1,4 +1,3 @@
-const mongoose = require("mongoose");
 const User = require("../models/User");
 const Brand = require("../models/Brand");
 
@@ -15,6 +14,7 @@ const brands = async () => {
               ,
               { name: "Periodic inspection" },
               { name: "Pneumatics check", time: null },
+              { name: "Oil change", distance: null },
             ],
           },
           { name: "z800" },
