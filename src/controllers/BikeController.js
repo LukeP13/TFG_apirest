@@ -1,11 +1,26 @@
 const { HttpCodes } = require("../../requestErrors");
 const User = require("../models/User");
 
-const getBike = async (req, res, done) => {};
+const getBike = async (req, res, done) => {
+  const { bikes } = req.user;
+  const { id } = req.params;
+
+  try {
+    const bike = await bikes.find(({ _id }) => id == _id);
+
+    if (!bike) res.status(HttpCodes.NotFound).json();
+    else res.json(bike);
+  } catch (e) {
+    res.status(HttpCodes.InternalServerError).json();
+  }
+
+  done();
+};
 
 const getBikes = async (req, res, done) => {
-  const { _id, bikes } = req.user;
+  const { bikes } = req.user;
   res.json(bikes);
+  done();
 };
 
 const postBike = async (req, res, done) => {

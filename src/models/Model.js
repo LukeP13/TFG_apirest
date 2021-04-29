@@ -1,16 +1,16 @@
-const mongoose              = require('mongoose')
-const { IntervalSchema }    = require('./Interval')
-const Schema                = mongoose.Schema
+const mongoose = require("mongoose");
+const { RevisionSchema } = require("./Revision");
+const Schema = mongoose.Schema;
 
-const ModelSchema   = Schema({
-    name: { type: String, required: true },
+const ModelSchema = Schema({
+  name: { type: String, required: true },
 
-    //Parameters
-    revisio: { type:IntervalSchema, default: {} },
-})
+  //Parameters
+  revisions: [{ type: RevisionSchema, default: {} }],
+});
 
-const Model = mongoose.model('Models', ModelSchema)
+const Model = mongoose.model("Models", ModelSchema);
 module.exports = {
-    Model,
-    ModelSchema
-}
+  Model,
+  ModelSchema,
+};
