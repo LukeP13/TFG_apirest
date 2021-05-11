@@ -4,8 +4,11 @@ const Schema = mongoose.Schema;
 
 const ModelSchema = Schema({
   name: { type: String, required: true },
+  distancePerYear: { type: Number, default: 0 },
+  totalDistance: { type: Number, default: 0 },
 
   //Parameters
+  incomingRevisions: [{ type: RevisionSchema, default: {} }],
   revisions: [{ type: RevisionSchema, default: {} }],
 });
 

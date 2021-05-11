@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const Brand = require("../models/Brand");
+const TIME = require("../lib/time");
 
 const brands = async () => {
   await Brand.deleteMany();
@@ -12,9 +13,12 @@ const brands = async () => {
             name: "z250",
             revisions: [
               ,
-              { name: "Periodic inspection" },
-              { name: "Pneumatics check", time: null },
-              { name: "Oil change", distance: null },
+              {
+                name: "Periodic inspection",
+                distance: 5000,
+                time: 6 * TIME.MONTH,
+              },
+              { name: "Pneumatics check", time: null, distance: 1000 },
             ],
           },
           { name: "z800" },
