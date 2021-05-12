@@ -29,7 +29,7 @@ const loginValidation = validate.bind(
     username: Joi.string(),
     email: Joi.string().email(),
     password: Joi.string().required(),
-    notificationToken: Joi.object(),
+    notificationToken: Joi.string().optional(),
   }).xor("username", "email")
 );
 

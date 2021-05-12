@@ -14,7 +14,7 @@ const UserSchema = Schema(
     avatar: { type: String },
 
     //Generated
-    notificationTokens: [Object],
+    notificationTokens: [String],
     bikes: [ModelSchema],
   },
   { timestamps: true }

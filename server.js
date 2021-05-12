@@ -16,7 +16,10 @@ const {
   fullUser,
 } = require("./src/middlewares/authenticate");
 const populateDB = require("./src/startup/populateDB");
-const updateIncomingRevisions = require("./src/tasks/updateBikes");
+const {
+  updateIncomingRevisions,
+  checkNotifications,
+} = require("./src/tasks/updateBikes");
 
 //Connect DB
 mongoose.connect(process.env.LOCAL_DB_CONNECTION, {
@@ -63,8 +66,8 @@ app.use(`${preroute}/users`, authenticate, UsersRoute);
 app.use(`${preroute}/bikes`, authenticate, fullUser, BikesRoute);
 
 //Notifications
-cron.schedule("00 * 0 * * *", () => {
+cron.schedule("00 * * * * *", () => {
   console.log("running every hour 12");
   updateIncomingRevisions();
-  sendNotifications();
+  checkNotifications();
 });

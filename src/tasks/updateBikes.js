@@ -1,3 +1,4 @@
+const sendNofification = require("../lib/notifications");
 const TIME = require("../lib/time");
 const User = require("../models/User");
 
@@ -57,8 +58,31 @@ async function updateIncomingRevisions() {
   }
 }
 
-async function checkNotifications(user) {
-  /* TODO */
+function myNotification({ bike, revision }) {
+  return {
+    title: `Pending inspection`,
+    body: `${bike} ${revision}`,
+  };
 }
 
-module.exports = updateIncomingRevisions;
+async function checkNotifications(user) {
+  (await User.find({}, { bikes: true, notificationTokens: true })).forEach(
+    ({ bikes, notificationTokens }) => {
+      notificationTokens &&
+        bikes.forEach((b) => {
+          b.incomingRevisions.forEach(({ name, time, distance }) => {
+            if (time === 0 || distance === 0)
+              sendNofification(
+                notificationTokens,
+                myNotification(b.name, name)
+              );
+          });
+        });
+    }
+  );
+}
+
+module.exports = {
+  updateIncomingRevisions,
+  checkNotifications,
+};
