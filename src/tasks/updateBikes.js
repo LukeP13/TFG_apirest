@@ -58,26 +58,30 @@ async function updateIncomingRevisions() {
   }
 }
 
-function myNotification({ bike, revision }) {
+function myNotification(body) {
   return {
     title: `Pending inspection`,
-    body: `${bike} ${revision}`,
+    body: `${body}`,
   };
 }
 
 async function checkNotifications(user) {
   (await User.find({}, { bikes: true, notificationTokens: true })).forEach(
     ({ bikes, notificationTokens }) => {
+      let notif = [];
       notificationTokens &&
-        bikes.forEach((b) => {
-          b.incomingRevisions.forEach(({ name, time, distance }) => {
-            if (time === 0 || distance === 0)
-              sendNofification(
-                notificationTokens,
-                myNotification(b.name, name)
-              );
-          });
+        bikes.forEach(({ name, incomingRevisions }) => {
+          let revisions = [];
+          incomingRevisions.forEach(
+            ({ name, time, distance }) =>
+              (time === 0 || distance === 0) && revisions.push(`${name}`)
+          );
+          revisions.length > 0 &&
+            notif.push(`- ${name}: ${revisions.join(", ")}`);
         });
+
+      notif.length > 1 &&
+        sendNofification(notificationTokens, myNotification(notif.join("\n")));
     }
   );
 }

@@ -30,8 +30,29 @@ const getBike = async (req, res, done) => {
 };
 
 const getBikes = async (req, res, done) => {
+  const sortBy = (first, second) => {
+    if (first.distance === 0 || first.time === 0) return -1;
+    else if (second.distance === 0 || second.time === 0) return 1;
+    else if (first.distance != null && second.distance != null) {
+      if (first.distance < second.distance) return -1;
+      else if (first.distance == second.distance) return 0;
+      else return 1;
+    } else if (first.time != null && second.time != null) {
+      if (first.time < second.time) return -1;
+      else if (first.time == second.time) return 0;
+      else return 1;
+    }
+
+    return -1;
+  };
+
   const { bikes } = req.user;
-  res.json(bikes);
+  res.json(
+    bikes.map((b) => {
+      b.incomingRevisions.sort(sortBy);
+      return b;
+    })
+  );
   done();
 };
 

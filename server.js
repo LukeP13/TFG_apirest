@@ -66,8 +66,9 @@ app.use(`${preroute}/users`, authenticate, UsersRoute);
 app.use(`${preroute}/bikes`, authenticate, fullUser, BikesRoute);
 
 //Notifications
-cron.schedule("00 * * * * *", () => {
+cron.schedule("00 * 0 * * *", () => {
   console.log("running every hour 12");
-  updateIncomingRevisions();
-  checkNotifications();
+  updateIncomingRevisions()
+    .then(checkNotifications)
+    .catch(() => {});
 });
