@@ -2,16 +2,21 @@ var mongoose = require("mongoose");
 const { HttpCodes } = require("../../requestErrors");
 const User = require("../models/User");
 
-function sortIncoming(...bikes) {
-  bikes = bikes.map((b) => {
-    return {
-      ...b,
-    };
-  });
+const sortBy = (first, second) => {
+  if (first.distance === 0 || first.time === 0) return -1;
+  else if (second.distance === 0 || second.time === 0) return 1;
+  else if (first.distance != null && second.distance != null) {
+    if (first.distance < second.distance) return -1;
+    else if (first.distance == second.distance) return 0;
+    else return 1;
+  } else if (first.time != null && second.time != null) {
+    if (first.time < second.time) return -1;
+    else if (first.time == second.time) return 0;
+    else return 1;
+  }
 
-  console.log(bikes);
-  return bikes;
-}
+  return 0;
+};
 
 const getBike = async (req, res, done) => {
   const { bikes } = req.user;
@@ -21,8 +26,12 @@ const getBike = async (req, res, done) => {
     const bike = await bikes.find(({ _id }) => id == _id);
 
     if (!bike) res.status(HttpCodes.NotFound).json();
-    else res.json(sortIncoming(bike));
+    else {
+      bike.incomingRevisions.sort(sortBy);
+      res.json(bike);
+    }
   } catch (e) {
+    console.log(e);
     res.status(HttpCodes.InternalServerError).json();
   }
 
@@ -30,22 +39,6 @@ const getBike = async (req, res, done) => {
 };
 
 const getBikes = async (req, res, done) => {
-  const sortBy = (first, second) => {
-    if (first.distance === 0 || first.time === 0) return -1;
-    else if (second.distance === 0 || second.time === 0) return 1;
-    else if (first.distance != null && second.distance != null) {
-      if (first.distance < second.distance) return -1;
-      else if (first.distance == second.distance) return 0;
-      else return 1;
-    } else if (first.time != null && second.time != null) {
-      if (first.time < second.time) return -1;
-      else if (first.time == second.time) return 0;
-      else return 1;
-    }
-
-    return -1;
-  };
-
   const { bikes } = req.user;
   res.json(
     bikes.map((b) => {
@@ -71,8 +64,43 @@ const postBike = async (req, res, done) => {
 
     const updated = await User.updateOne(
       { _id: req.user._id },
-      { $push: { bikes: bike } },
-      { new: true }
+      { $push: { bikes: bike } }
+    );
+
+    res.json(updated);
+    done();
+  } catch (err) {
+    res.status(HttpCodes.InternalServerError).json({ message: err });
+  }
+};
+
+const convertArrayToObject = (array, key) => {
+  const initialValue = {};
+  return array.reduce((obj, item) => {
+    return {
+      ...obj,
+      [item[key]]: item,
+    };
+  }, initialValue);
+};
+
+const patchBike = async (req, res, done) => {
+  const { id } = req.params;
+  const body = {};
+  for (const item in req.body) {
+    body[`bikes.$[elem].${item}`] = req.body[item];
+  }
+
+  try {
+    const updated = await User.updateOne(
+      { _id: req.user._id },
+      {
+        $set: body,
+      },
+      {
+        arrayFilters: [{ "elem._id": id }],
+        new: true,
+      }
     );
 
     res.json(updated);
@@ -82,8 +110,6 @@ const postBike = async (req, res, done) => {
     res.status(HttpCodes.InternalServerError).json({ message: err });
   }
 };
-
-const patchBike = async (req, res, done) => {};
 
 const deleteBike = async (req, res, done) => {};
 

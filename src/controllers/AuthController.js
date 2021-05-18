@@ -55,10 +55,12 @@ const login = (req, res, next) => {
         .then(async (correct) => {
           if (correct) {
             let token = jwt.sign(
-              {
-                _id: user._id,
-                notificationToken: notificationToken,
-              },
+              notificationToken
+                ? {
+                    _id: user._id,
+                    notificationToken: notificationToken,
+                  }
+                : { _id: user._id },
               process.env.JWT_TOKEN_KEY,
               process.env.LOGIN_EXPIRE_TIME
                 ? { expiresIn: process.env.LOGIN_EXPIRE_TIME }
@@ -100,8 +102,34 @@ const logout = async (req, res, next) => {
   next();
 };
 
+const addToken = async (req, res, next) => {
+  const { _id, notificationToken } = req.user;
+  let token = notificationToken || req.body.token;
+  try {
+    await User.updateOne({ _id }, { $addToSet: { notificationTokens: token } });
+    res.json();
+    next();
+  } catch (err) {
+    res.status(501).json({ status: "error", message: err });
+  }
+};
+
+const removeToken = async (req, res, next) => {
+  const { _id, notificationToken } = req.user;
+  let token = notificationToken || req.body.token;
+  try {
+    await User.updateOne({ _id }, { $pull: { notificationTokens: token } });
+    res.json();
+    next();
+  } catch (err) {
+    res.status(501).json({ status: "error", message: err });
+  }
+};
+
 module.exports = {
   register,
   login,
   logout,
+  addToken,
+  removeToken,
 };
