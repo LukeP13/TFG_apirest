@@ -7,59 +7,38 @@ async function updates(id, distPerDay) {
     {},
     {
       $inc: {
-        "bikes.$[bike].incomingRevisions.$[rev].time": -TIME.DAY,
-      },
-      $set: {
-        "bikes.$[bike].incomingRevisions.$[rev2].time": -TIME.DAY,
-      },
-    },
-    {
-      arrayFilters: [
-        { "bike._id": id },
-        {
-          "rev.time": { $gt: 0 },
-        },
-        {
-          "rev2.distance": { $lt: 0, $ne: null },
-        },
-      ],
-    }
-  );
-  let dist = User.updateMany(
-    {},
-    {
-      $inc: {
-        "bikes.$[bike].incomingRevisions.$[rev].distance": -distPerDay,
-      },
-      $set: {
-        "bikes.$[bike].incomingRevisions.$[rev2].distance": 0,
-      },
-    },
-    {
-      arrayFilters: [
-        { "bike._id": id },
-        {
-          "rev.distance": { $gt: 0 },
-        },
-        {
-          "rev2.distance": { $lt: 0, $ne: null },
-        },
-      ],
-    }
-  );
-  let total = User.updateMany(
-    {},
-    {
-      $inc: {
+        "bikes.$[bike].incomingRevisions.$[revT].time": -TIME.DAY,
+        "bikes.$[bike].incomingRevisions.$[revD].distance": -distPerDay,
         "bikes.$[bike].totalDistance": +distPerDay,
       },
+      $set: {
+        "bikes.$[bike].incomingRevisions.$[revT2].time": -TIME.DAY,
+        "bikes.$[bike].incomingRevisions.$[revD2].distance": 0,
+      },
     },
     {
-      arrayFilters: [{ "bike._id": id }],
+      arrayFilters: [
+        { "bike._id": id },
+        {
+          "revT.time": { $gt: 0 },
+          "revT.inProgress": { $ne: true },
+        },
+        {
+          "revT2.distance": { $lt: 0, $ne: null },
+          "revT2.inProgress": { $ne: true },
+        },
+        {
+          "revD.distance": { $gt: 0 },
+          "revD.inProgress": { $ne: true },
+        },
+        {
+          "revD2.distance": { $lt: 0, $ne: null },
+          "revD2.inProgress": { $ne: true },
+        },
+      ],
     }
   );
-
-  return Promise.all([time, dist, total]);
+  return time;
 }
 
 async function updateIncomingRevisions() {
@@ -90,9 +69,10 @@ async function checkNotifications(user) {
         bikes.forEach(({ name, incomingRevisions }) => {
           let revisions = [];
           incomingRevisions.forEach(
-            ({ name, time, distance, notify }) =>
+            ({ name, time, distance, notify, inProgress }) =>
               (time === 0 || distance === 0) &&
               notify &&
+              !inProgress &&
               revisions.push(`${name}`)
           );
           revisions.length > 0 &&

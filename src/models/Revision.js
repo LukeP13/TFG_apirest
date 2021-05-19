@@ -8,6 +8,7 @@ const RevisionSchema = Schema({
   time: { type: Number },
   distance: { type: Number },
   notify: { type: Boolean, default: true },
+  inProgress: { type: Boolean, default: false },
 });
 
 module.exports = {

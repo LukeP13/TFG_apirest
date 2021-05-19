@@ -74,16 +74,6 @@ const postBike = async (req, res, done) => {
   }
 };
 
-const convertArrayToObject = (array, key) => {
-  const initialValue = {};
-  return array.reduce((obj, item) => {
-    return {
-      ...obj,
-      [item[key]]: item,
-    };
-  }, initialValue);
-};
-
 const patchBike = async (req, res, done) => {
   const { id } = req.params;
   const body = {};
@@ -106,12 +96,29 @@ const patchBike = async (req, res, done) => {
     res.json(updated);
     done();
   } catch (err) {
-    console.log(err);
-    res.status(HttpCodes.InternalServerError).json({ message: err });
+    res
+      .status(HttpCodes.InternalServerError)
+      .json({ status: "error", message: err });
   }
 };
 
-const deleteBike = async (req, res, done) => {};
+const deleteBike = async (req, res, done) => {
+  const { id } = req.params;
+  try {
+    const updated = await User.updateOne(
+      { _id: req.user._id },
+      {
+        $pull: { bikes: { _id: id } },
+      }
+    );
+    res.json(updated);
+    done();
+  } catch (err) {
+    res
+      .status(HttpCodes.InternalServerError)
+      .json({ status: "error", message: err });
+  }
+};
 
 module.exports = {
   getBike,
