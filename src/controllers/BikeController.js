@@ -5,6 +5,8 @@ const User = require("../models/User");
 const sortBy = (first, second) => {
   if (first.distance === 0 || first.time === 0) return -1;
   else if (second.distance === 0 || second.time === 0) return 1;
+  else if (first.inProgress) return -1;
+  else if (second.inProgress) return 1;
   else if (first.distance != null && second.distance != null) {
     if (first.distance < second.distance) return -1;
     else if (first.distance == second.distance) return 0;
@@ -42,7 +44,7 @@ const getBikes = async (req, res, done) => {
   const { bikes } = req.user;
   res.json(
     bikes.map((b) => {
-      b.incomingRevisions.sort(sortBy);
+      b.incomingRevisions && b.incomingRevisions.sort(sortBy);
       return b;
     })
   );
@@ -76,6 +78,19 @@ const postBike = async (req, res, done) => {
 
 const patchBike = async (req, res, done) => {
   const { id } = req.params;
+  let { revisions, incomingRevisions } = req.body;
+  if (revisions && incomingRevisions)
+    revisions.forEach((elem, i) => {
+      let j = incomingRevisions.findIndex(
+        (elem2) => JSON.stringify(elem) === JSON.stringify(elem2)
+      );
+      if (j >= 0) {
+        let _id = mongoose.Types.ObjectId();
+        req.body.revisions[i]._id = _id;
+        req.body.incomingRevisions[j]._id = _id;
+      }
+    });
+
   const body = {};
   for (const item in req.body) {
     body[`bikes.$[elem].${item}`] = req.body[item];
