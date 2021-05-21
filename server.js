@@ -46,7 +46,7 @@ app.use(cors());
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use("/uploads", authenticate, express.static("uploads"));
+app.use("/uploads", express.static("uploads"));
 
 //Start listening
 const port = process.env.PORT || 5000;
@@ -62,12 +62,11 @@ app.use(`${preroute}/`, AuthRoute);
 app.use(`${preroute}/brands`, BrandsRoute);
 
 //Private routes
-app.use(`${preroute}/users`, authenticate, UsersRoute);
+app.use(`${preroute}/user`, authenticate, UsersRoute);
 app.use(`${preroute}/bikes`, authenticate, fullUser, BikesRoute);
 
 //Notifications
 cron.schedule("0 * * * * *", () => {
-  console.log("Updating bikes");
   updateIncomingRevisions()
     .then(checkNotifications)
     .catch(() => {

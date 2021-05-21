@@ -2,6 +2,40 @@ const User = require("../models/User");
 const Brand = require("../models/Brand");
 const TIME = require("../lib/time");
 
+const defaultRevisions = [
+  {
+    name: "Periodic inspection",
+    distance: 5000,
+    time: 6 * TIME.MONTH,
+  },
+  {
+    name: "Oil change",
+    distance: 5000,
+  },
+  {
+    name: "Oil filter",
+    distance: 10000,
+  },
+  {
+    name: "Chain tension",
+    distance: 1000,
+  },
+  { name: "Pneumatics check", time: null, distance: 5000 },
+  {
+    name: "ITV",
+    time: 2 * TIME.YEAR,
+  },
+  {
+    name: "Engine valve balance",
+    distance: 15000,
+  },
+  {
+    name: "Timing Chain",
+    distance: 100000,
+    time: 10 * TIME.YEAR,
+  },
+];
+
 const brands = async () => {
   await Brand.deleteMany();
   await Brand.insertMany(
@@ -21,27 +55,27 @@ const brands = async () => {
               { name: "Pneumatics check", time: null, distance: 1000 },
             ],
           },
-          { name: "z800" },
-          { name: "ninja 125" },
-          { name: "er6-f" },
+          { name: "z800", revisions: defaultRevisions },
+          { name: "ninja 125", revisions: defaultRevisions },
+          { name: "er6-f", revisions: defaultRevisions },
         ],
       },
       {
         name: "Ducati",
         models: [
-          { name: "Panigale V4" },
-          { name: "Supersport" },
-          { name: "Multistrada 950" },
-          { name: "Multistrada 1260" },
+          { name: "Panigale V4", revisions: defaultRevisions },
+          { name: "Supersport", revisions: defaultRevisions },
+          { name: "Multistrada 950", revisions: defaultRevisions },
+          { name: "Multistrada 1260", revisions: defaultRevisions },
         ],
       },
       {
         name: "KTM",
         models: [
-          { name: "Duke 125" },
-          { name: "Duke 200" },
-          { name: "RC 200" },
-          { name: "RC 390" },
+          { name: "Duke 125", revisions: defaultRevisions },
+          { name: "Duke 200", revisions: defaultRevisions },
+          { name: "RC 200", revisions: defaultRevisions },
+          { name: "RC 390", revisions: defaultRevisions },
         ],
       },
     ],

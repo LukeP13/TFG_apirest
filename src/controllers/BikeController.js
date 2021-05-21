@@ -42,13 +42,17 @@ const getBike = async (req, res, done) => {
 
 const getBikes = async (req, res, done) => {
   const { bikes } = req.user;
-  res.json(
-    bikes.map((b) => {
-      b.incomingRevisions && b.incomingRevisions.sort(sortBy);
-      return b;
-    })
-  );
-  done();
+  try {
+    res.json(
+      bikes.map((b) => {
+        b.incomingRevisions && b.incomingRevisions.sort(sortBy);
+        return b;
+      })
+    );
+    done();
+  } catch (err) {
+    res.status(HttpCodes.InternalServerError).json({ message: err });
+  }
 };
 
 const postBike = async (req, res, done) => {
