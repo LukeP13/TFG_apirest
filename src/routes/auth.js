@@ -21,4 +21,8 @@ router.post("/logout", authenticate, AuthController.logout);
 router.post("/tokens", authenticate, AuthController.addToken);
 router.delete("/tokens", authenticate, AuthController.removeToken);
 
+router.post("/forgotPassword", AuthController.forgotPassword);
+router.post("/checkPasswordCode", AuthController.checkPasswordCode);
+router.post("/resetPassword", AuthController.resetPassword);
+
 module.exports = router;

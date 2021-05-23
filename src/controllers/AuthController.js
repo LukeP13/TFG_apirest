@@ -5,12 +5,14 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const fs = require("fs");
 const { promisify } = require("util");
+const { sendPasswordCode } = require("../lib/mailing");
+const TIME = require("../lib/time");
 
 const unlinkAsync = promisify(fs.unlink);
 
 const register = async (req, res, next) => {
   const hashedPass = await bcrypt.hash(req.body.password, 10);
-  console.log(hashedPass);
+
   let user = new User({
     username: req.body.username,
     email: req.body.email,
@@ -126,10 +128,79 @@ const removeToken = async (req, res, next) => {
   }
 };
 
+const forgotPassword = async (req, res, next) => {
+  try {
+    const code = Math.floor(100000 + Math.random() * 900000);
+    const { email } = await User.findOneAndUpdate(
+      { email: req.body.email },
+      {
+        $set: { resetCode: `${code}` },
+      },
+      { new: true, useFindAndModify: false }
+    );
+
+    if (email) {
+      setTimeout(() => {
+        User.updateOne(
+          { email: req.body.email },
+          { $set: { resetCode: null } }
+        );
+      }, 1 * TIME.MINUTE);
+
+      sendPasswordCode(email, code);
+    }
+
+    res.json();
+  } catch (err) {
+    res.status(404).json();
+  }
+  next();
+};
+
+const checkPasswordCode = async (req, res, next) => {
+  const { email, code } = req.body;
+
+  try {
+    const { resetCode } = await User.findOne({ email });
+    if (code == resetCode) res.json({ message: "Valid code!" });
+    else res.status(404).json({ message: "Invalid code!" });
+
+    next();
+  } catch (_) {
+    console.log(_);
+    res.status(401).json({ message: "Invalid code!" });
+  }
+};
+
+const resetPassword = async (req, res, next) => {
+  const { email, code, password } = req.body;
+  try {
+    const { resetCode } = await User.findOne({ email });
+    if (code === resetCode) {
+      const hashedPass = await bcrypt.hash(password, 10);
+      if (hashedPass) {
+        const updated = await User.updateOne(
+          { email },
+          {
+            password: hashedPass,
+            resetCode: null,
+          }
+        );
+        res.json(updated);
+      } else res.status(501).json("Error hashing password");
+    } else res.status(401).json({ message: "Invalid code!" });
+  } catch (_) {
+    res.status(401).json({ message: "Invalid code!" });
+  }
+};
+
 module.exports = {
   register,
   login,
   logout,
   addToken,
   removeToken,
+  forgotPassword,
+  checkPasswordCode,
+  resetPassword,
 };

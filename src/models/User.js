@@ -16,6 +16,7 @@ const UserSchema = Schema(
     //Generated
     notificationTokens: [String],
     bikes: [ModelSchema],
+    resetCode: { type: String },
   },
   { timestamps: true }
 );

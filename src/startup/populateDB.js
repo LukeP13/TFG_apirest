@@ -88,7 +88,7 @@ const users = async () => {
   User.insertMany([
     {
       username: "postman",
-      email: "postman@postman.com",
+      email: "dryluck13@gmail.com",
       password: "$2a$10$5ivwlytgRnoBuUTm3K5DveMDT9gtMN73FufgagSpmDYW4NPuOGBcW",
       phone: "666222999",
       avatar: "uploads\\1617206181664.png",
