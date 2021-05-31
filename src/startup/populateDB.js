@@ -78,6 +78,60 @@ const brands = async () => {
           { name: "RC 390", revisions: defaultRevisions },
         ],
       },
+      {
+        name: "BMW",
+        models: [
+          { name: "G 310 R", revisions: defaultRevisions },
+          { name: "F 900 R", revisions: defaultRevisions },
+          { name: "M 1000 RR", revisions: defaultRevisions },
+          { name: "S 1000 RR", revisions: defaultRevisions },
+          { name: "R 1000 RS", revisions: defaultRevisions },
+          { name: "K 1600 GTL", revisions: defaultRevisions },
+          { name: "R 18 Classic", revisions: defaultRevisions },
+        ],
+      },
+      {
+        name: "Harley-Davidson",
+        models: [
+          { name: "Iron 883", revisions: defaultRevisions },
+          { name: "Iron 1200", revisions: defaultRevisions },
+          { name: "Forty-eight", revisions: defaultRevisions },
+          { name: "Softail Standard", revisions: defaultRevisions },
+          { name: "Street Bob", revisions: defaultRevisions },
+          { name: "Low Rider", revisions: defaultRevisions },
+        ],
+      },
+      {
+        name: "Honda",
+        models: [
+          { name: "CBR 1000RR", revisions: defaultRevisions },
+          { name: "CBR 600RR", revisions: defaultRevisions },
+          { name: "CRF150RB", revisions: defaultRevisions },
+          { name: "CRF230F", revisions: defaultRevisions },
+          { name: "CRF 1000L Africa Twin", revisions: defaultRevisions },
+          { name: "NC750S DCT", revisions: defaultRevisions },
+        ],
+      },
+      {
+        name: "Indian Motorcycles",
+        models: [],
+      },
+      {
+        name: "Royal Endfield",
+        models: [],
+      },
+      {
+        name: "Suzuki",
+        models: [],
+      },
+      {
+        name: "Triumph",
+        models: [],
+      },
+      {
+        name: "Yamaha",
+        models: [],
+      },
     ],
     { setDefaultsOnInsert: true }
   );
