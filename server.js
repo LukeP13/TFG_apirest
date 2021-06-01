@@ -35,7 +35,6 @@ db.on("error", (err) => {
 
 db.once("open", () => {
   console.log("Database Connection Established!");
-  populateDB();
 });
 
 /**** APP ****/
