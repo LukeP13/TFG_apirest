@@ -22,7 +22,7 @@ const {
 } = require("./src/tasks/updateBikes");
 
 //Connect DB
-mongoose.connect(process.env.LOCAL_DB_CONNECTION, {
+mongoose.connect(process.env.REMOTE_DB_CONNECTION, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   useCreateIndex: true,
@@ -66,10 +66,10 @@ app.use(`${preroute}/user`, authenticate, UsersRoute);
 app.use(`${preroute}/bikes`, authenticate, fullUser, BikesRoute);
 
 //Notifications
-cron.schedule("0 * * * * *", () => {
+cron.schedule("00 00 00 * * *", () => {
   updateIncomingRevisions()
     .then(checkNotifications)
     .catch(() => {
-      console.log("error");
+      console.log("Error updating incoming revisions");
     });
 });
