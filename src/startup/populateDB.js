@@ -151,7 +151,7 @@ const users = async () => {
 };
 
 async function populateDB() {
-  brands();
+  //brands();
   //users();
 }
 
